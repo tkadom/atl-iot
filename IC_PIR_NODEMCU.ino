@@ -76,6 +76,7 @@ String macToStr(const uint8_t* mac)
 
 
 void sendMotionReport(int elapsedTime) {
+
   char sendBuffer[128];
 
   // Generate client name based on MAC address 
@@ -84,6 +85,8 @@ void sendMotionReport(int elapsedTime) {
   uint8_t mac[6];
   WiFi.macAddress(mac);
   clientName += macToStr(mac);
+
+  MQTT_connect();
 
     if (elapsedTime > 0 ) {
            sprintf(sendBuffer,"{\"id\":\"%s\",\"name\":\"%s\",\"motion\":\"%s\",\"time\":\"%d\"}",clientName.c_str(), "Entry","End",elapsedTime/1000);
@@ -158,9 +161,9 @@ void setup() {
 }
 
 void loop() {
-  
-  MQTT_connect();
+
   reportMotion(20 * 1000);  /* milliseconds */
+  
   
 }
 
