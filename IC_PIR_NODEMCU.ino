@@ -74,6 +74,17 @@ String macToStr(const uint8_t* mac)
   return result;
 }
 
+void checkConnection(int intervalInSeconds)
+{
+  static int timeSinceLastCheck = 0;
+  
+  if ((millis() - timeSinceLastCheck ) > (intervalInSeconds * 1000))
+  {
+    MQTT_connect();
+    timeSinceLastCheck = millis();
+    Serial.println("checking connection");
+  }
+}
 
 void sendMotionReport(int elapsedTime) {
 
@@ -89,10 +100,10 @@ void sendMotionReport(int elapsedTime) {
   MQTT_connect();
 
     if (elapsedTime > 0 ) {
-           sprintf(sendBuffer,"{\"id\":\"%s\",\"name\":\"%s\",\"motion\":\"%s\",\"time\":\"%d\"}",clientName.c_str(), "Entry","End",elapsedTime/1000);
+           sprintf(sendBuffer,"{\"id\":\"%s\",\"name\":\"%s\",\"motion\":\"%s\",\"time\":\"%d\"}",clientName.c_str(), "Willow","End",elapsedTime/1000);
     }
     else {
-            sprintf(sendBuffer,"{\"id\":\"%s\",\"name\":\"%s\",\"motion\":\"%s\",\"time\":\"%d\"}",clientName.c_str(), "Entry","Start",0);
+            sprintf(sendBuffer,"{\"id\":\"%s\",\"name\":\"%s\",\"motion\":\"%s\",\"time\":\"%d\"}",clientName.c_str(), "Willow","Start",0);
    
     }
   Serial.println(sendBuffer);
@@ -162,6 +173,7 @@ void setup() {
 
 void loop() {
 
+  checkConnection(60) ; //Check the connection to the QUEUE periodically to ensure we are still connected.
   reportMotion(20 * 1000);  /* milliseconds */
   
   
